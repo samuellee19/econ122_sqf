@@ -27,7 +27,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r packageCheck, include=FALSE}
-mypacks <- c("plotly", "tidyverse", "sp", "sf", "shiny", "shinydashboard", "shinyjs", "DT", "mapdeck", "rgdal")  # what packages are needed?
+mypacks <- c("plotly", "tidyverse", "sp", "sf", "shiny", "shinydashboard", "shinyjs", "DT", "mapdeck", "rgdal", "readxl", "readr", "rio", "ggplot2","dplyr", "ROCR", "boot","class","randomForest","e1071", "stringr","partykit","rpart", "sp", "glmnet","forcats","tidyverse","caret", "curl", "colourvalues", "downloader")  # what packages are needed?
 packs <- installed.packages()   # find installed package list
 install.me <- mypacks[!(mypacks %in% packs[,"Package"])]  #what needs to be installed?
 if (length(install.me) >= 1) install.packages(install.me, repos = "http://cran.us.r-project.org")   # install (if needed)
@@ -35,11 +35,10 @@ lapply(mypacks, library, character.only=TRUE)  # load all packages
 ```
 
 # Project Overview
-
 ## Background:
 The **Stop, Question and Frisk** program is a practice, utilized by New York City Police Department (NYPD), of temporarily halting, questioning, and, in certain cases, searching civilians on the street for weapons and other dangers. It is also called "Terry Stop," named after the Supreme Court case Terry v. Ohio (1968).
 
-The use of **Stop, Question and Frisk" practice is often endorsed with the Broken Windows Theory, suggesting that even **low-level crimes and civil disorder leads to more serious crimes in urban enviornments.** In fact, after NYPD officer Adrian Schoolcraft made extensive recordings on the department's Stop and Frisk policy, numerous civil rights organizations, such as NYCLU, raised a concern that the program unfairly targest certain minorities, such as African-Americans and Hispanic-Americans. 
+The use of **Stop, Question and Frisk** practice is often endorsed with the Broken Windows Theory, suggesting that even **low-level crimes and civil disorder leads to more serious crimes in urban enviornments.** In fact, after NYPD officer Adrian Schoolcraft made extensive recordings on the department's Stop and Frisk policy, numerous civil rights organizations, such as NYCLU, raised a concern that the program **unfairly targest certain minorities, such as African-Americans and Hispanic-Americans**. 
 
 A major turning point was the 2013 court case Floyd v. City of New York and a subsequent NYPD mandate that requires officers to thoroughly justify the reason for making a stop.[34] In 2013, 191,558 stops were made.[35]
 
@@ -68,46 +67,182 @@ A major turning point was the 2013 court case Floyd v. City of New York and a su
 - Combine data with crime rates per precinct for previous year, because you'd expect more unsafe areas to have more stop and frisk/safety patrolling, see trend between stop and frisk and crime rate of area
 - See further what drives stop and frisk between areas by splitting it up by era and seeing main variables
 
-```{r import, eval = FALSE, tidy=FALSE}
-# importing frisk data
+```{r, tidy=FALSE}
+# Samuel's Part
+SQF1718 <- read_csv("https://github.com/samuellee19/econ122_sqf/raw/master/Data%20Files%20Only/SQF1718.csv")
+
+# Priyanka's Part
 url <- "https://www.nyclu.org/sites/default/files/field_documents/2018_sqf_database.xlsx"
-destfile <- "X2018_sqf_database.xlsx"
+destfile <- "2018_sqf_database.xlsx"
 curl::curl_download(url, destfile)
-SQF2018 <- read_excel(destfile) %>%
-  mutate(SUSPECT_HEIGHT = as.numeric(SUSPECT_HEIGHT))
+# Create a vector of Excel files to read
+files.to.read = list.files(pattern="xlsx")
+
+# Read each file and write it to csv
+library("rio")
+xls <- dir(pattern = "xlsx")
+created <- mapply(convert, xls, gsub("xlsx", "csv", xls))
+unlink(xls) # delete xlsx files
+SQF2018 <- read.csv("2018_sqf_database.csv")
+
 
 url <- "https://www1.nyc.gov/assets/nypd/downloads/excel/analysis_and_planning/stop-question-frisk/sqf-2017.xlsx"
-destfile <- "sqf-2017.xlsx"
+destfile <- "2017_sqf_database.xlsx"
 curl::curl_download(url, destfile)
-SQF2017 <- read_excel(destfile)
+# Create a vector of Excel files to read
+files.to.read = list.files(pattern="xlsx")
 
-SQF1718 <- SQF2018 %>%
-  mutate(STOP_FRISK_ID = STOP_FRISK_ID + nrow(SQF2017)) %>%
-  rename(STOP_FRISK_TIME = "Stop Frisk Time") %>%
-  full_join(SQF2017)
+# Read each file and write it to csv
+library("rio")
+xls <- dir(pattern = "xlsx")
+created <- mapply(convert, xls, gsub("xlsx", "csv", xls))
+unlink(xls) # delete xlsx files
+SQF2017 <- read.csv("2017_sqf_database.csv")
 
-SQF1718 <- SQF1718[order(SQF1718$STOP_FRISK_ID),]
 
-# importing codebook
-url <- "https://www.nyclu.org/sites/default/files/field_documents/2018_sqf_codebook.xlsx"
-destfile <- "X2018_sqf_codebook.xlsx"
+url <- "https://www.nyclu.org/sites/default/files/field_documents/2016_sqf_database.xlsx"
+destfile <- "2016_sqf_database.xlsx"
 curl::curl_download(url, destfile)
-SQF2018_cb <- read_excel(destfile)
+# Create a vector of Excel files to read
+files.to.read = list.files(pattern="xlsx")
 
-# write to csv file
-#write_csv(SQF1718, "/Users/slee19/Documents/Junior\ First\ Semester/SQF1718.csv")
+# Read each file and write it to csv
+library("rio")
+xls <- dir(pattern = "xlsx")
+created <- mapply(convert, xls, gsub("xlsx", "csv", xls))
+unlink(xls) # delete xlsx files
+SQF2016 <- read.csv("2016_sqf_database.csv")
 
-View(SQF2018_cb)
+url <- "https://www1.nyc.gov/assets/nypd/downloads/excel/analysis_and_planning/stop-question-frisk/sqf-2015.csv"
+destfile <- "sqf-2015.csv"
+curl::curl_download(url, destfile)
+SQF2015 <- read.csv(destfile)
+```
+
+```{r, echo = FALSE}
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2014-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2014.csv"
+SQF2014 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2013-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2013.csv"
+SQF2013 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2012-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2012.csv"
+SQF2012 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2011-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2011.csv"
+SQF2011 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2010-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2010.csv"
+SQF2010 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2009-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2009.csv"
+SQF2009 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2008-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2008.csv"
+SQF2008 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2007-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2007.csv"
+SQF2007 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2006-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2006.csv"
+SQF2006 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2005-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2005.csv"
+SQF2005 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2004-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2004.csv"
+SQF2004 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/zip/analysis_and_planning/stop-question-frisk/sqf-2003-csv.zip"
+download(url, dest="dataset.zip", mode="wb")
+unzip ("dataset.zip", exdir = "./")
+destfile <- "2003.csv"
+SQF2003 <- read.csv(destfile)
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/excel/analysis_and_planning/historical-crime-data/seven-major-felony-offenses-by-precinct-2000-2018.xls"
+destfile <- "crime_by_precinct.xls"
+curl::curl_download(url, destfile)
+```
+
+```{r, echo = FALSE}
+# Create a vector of Excel files to read
+files.to.read = list.files(pattern="xls")
+
+# Read each file and write it to csv
+library("rio")
+xls <- dir(pattern = "xls")
+created <- mapply(convert, xls, gsub("xls", "csv", xls))
+
+unlink(xls) # delete xlsx files
+CrimeRates <- read.csv("crime_by_precinct.csv", skip = 2)
+
+# Cleaning crime rate df
+library(data.table)
+setDT(CrimeRates)[, PCT:=PCT[1L] ,cumsum(PCT!="")]
+CrimeRates <- CrimeRates[CrimeRates$CRIME == "TOTAL SEVEN MAJOR FELONY OFFENSES",]
+yearsAll <- c('2000', '2001', '2002', '2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')
+yearsHave <- c('2003', '2004', '2005', '2006', '2007', '2008', '2009', '2010', '2011', '2012', '2013', '2014', '2015', '2016', '2017', '2018')
+
+colToDrop <- c('X2000', 'X2001', 'X2002', 'X2003', 'X2004', 'X2005', 'X2006', 'X2007', 'X2008', 'X2009', 'X2010', 'X2011', 'X2012', 'X2013', 'X2014', 'X2015', 'X2016', 'X2017', 'X2018', 'CRIME')
+CrimeRates$PCT <- as.numeric(CrimeRates$PCT)
+
+# Finding percentage change compared to previous year
+CrimeChangePercentage <- CrimeRates
+CrimeChangePercentage <- CrimeChangePercentage %>% mutate("2003" = log(X2003, 10)-log(X2002, 10)) %>% mutate("2004" = log(X2004, 10)-log(X2003, 10))%>% mutate("2005" = log(X2005, 10)-log(X2004, 10)) %>% mutate("2006" = log(X2006, 10)-log(X2005, 10)) %>% mutate("2007" = log(X2007, 10)-log(X2006, 10)) %>% mutate("2008" = log(X2008, 10)-log(X2007, 10)) %>% mutate("2009" = log(X2009, 10)-log(X2008, 10)) %>% mutate("2010" = log(X2010, 10)-log(X2009, 10)) %>% mutate("2011" = log(X2011, 10)-log(X2010, 10)) %>% mutate("2012" = log(X2012, 10)-log(X2011, 10)) %>% mutate("2013" = log(X2013, 10)-log(X2012, 10)) %>% mutate("2014" = log(X2014, 10)-log(X2013, 10)) %>% mutate("2015" = log(X2015, 10)-log(X2014, 10)) %>% mutate("2016" = log(X2016, 10)-log(X2015, 10)) %>% mutate("2017" = log(X2017, 10)-log(X2016, 10)) %>% mutate("2018" = log(X2018, 10)-log(X2017, 10))
+CrimeChangePercentage <- CrimeChangePercentage[, !colnames(CrimeChangePercentage) %in% colToDrop] %>% gather(yearsHave, key = "year", value = "crimeChange")
+CrimeChangePercentage$year <- as.numeric(CrimeChangePercentage$year)
+
+# Making new data set: Year, Borough, Crime Rate, Number of Stop and Frisks
+# Graph Crime Rate vs Number, for each Borough to see if they're actually correlated, color by year
+#Making values in terms of Standard Deviations by year
+CrimeRates <- CrimeRates %>% mutate("2000" = scale(X2000)) %>% mutate("2001" = scale(X2001)) %>% mutate("2002" = scale(X2002)) %>% mutate("2003" = scale(X2003)) %>% mutate("2004" = scale(X2004)) %>% mutate("2005" = scale(X2005)) %>% mutate("2006" = scale(X2006)) %>% mutate("2007" = scale(X2007)) %>% mutate("2008" = scale(X2008)) %>% mutate("2009" = scale(X2009)) %>% mutate("2010" = scale(X2010)) %>% mutate("2011" = scale(X2011)) %>% mutate("2012" = scale(X2012)) %>% mutate("2013" = scale(X2013)) %>% mutate("2014" = scale(X2014)) %>% mutate("2015" = scale(X2015)) %>% mutate("2016" = scale(X2016)) %>% mutate("2017" = scale(X2017)) %>% mutate("2018" = scale(X2018))
+CrimeRates <- CrimeRates[, !colnames(CrimeRates) %in% colToDrop] %>% gather(yearsAll, key = "year", value = "crimeSD")
+CrimeRates$year <- as.numeric(CrimeRates$year)
+```
+
+```{r, echo = FALSE}
+# Data frame creation for seeing if crime rate of previous year effects the stop and frisk amount
+SQF2017 <- SQF2017 %>% mutate('pct' = SQF2017$STOP_LOCATION_PRECINCT, 'year' = SQF2017$YEAR2)
+SQF2018 <- SQF2018 %>% mutate('pct' = SQF2018$STOP_LOCATION_PRECINCT, 'year' = SQF2018$YEAR2)
+CrimeRates <- CrimeRates %>% mutate(year = year+1)
 ```
 
 ## Visualizations
 
-
-```{r, tidy=FALSE}
-SQF1718 <- read_csv("https://github.com/samuellee19/econ122_sqf/raw/master/Data%20Files%20Only/SQF1718.csv")
-```
-
-```{r, layout = "1-screen-insert shaded", echo = FALSE}
+```{r, layout = "1-page", echo = FALSE, fig.height = 3}
 SQF1718 <- read_csv("https://github.com/samuellee19/CS5_Project/raw/master/SQF1718.csv")
 test_latlong <- SQF1718[!is.na(SQF1718$STOP_LOCATION_X),]
 test_latlong <- test_latlong[!is.na(test_latlong$STOP_LOCATION_Y),] %>%
@@ -143,9 +278,10 @@ p <- plot_locations_sp %>%
   layout(font = list(color='white'),
          plot_bgcolor = '#191A1A', paper_bgcolor = '#191A1A',
          mapbox = list(style = 'dark'))
+p
 ```
 
-```{r mapdeck, layout='l-screen', fig.height=2, out.width='100%', fig.align='center'} 
+```{r mapdeck, layout='l-screen', fig.height=2, out.width='100%', fig.align='center', echo = FALSE} 
 mapdeck(token = "pk.eyJ1Ijoic2xlZTE5IiwiYSI6ImNrNDZmbWl1aTBqcmgzZW8xeDJzcTBsMXEifQ.OvJvDwdVBfB02NaJVLq7Fw", style = mapdeck_style("dark"), pitch = 45) %>%
   add_screengrid(data = plot_locations_sp,
                  weight = "weight",
@@ -162,8 +298,81 @@ mapdeck(token = "pk.eyJ1Ijoic2xlZTE5IiwiYSI6ImNrNDZmbWl1aTBqcmgzZW8xeDJzcTBsMXEi
 ## Effect of Stop and Frisk on Crime Rates
 - Analyze stop and frisk amount as standard deviation for the year vs the change in crime amount from current to previous year, again as a standard deviation
 
-```{r, echo = FALSE}
-# Priyanka code chunk
+```{r, echo=FALSE, warning=FALSE}
+# Gives frame with pct, year, and count with the crime changw
+temp <- SQF2003 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+crimeAndCount <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+
+temp <- SQF2004 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2005 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2006 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2007 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2008 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2009 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2010 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2011 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2012 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2013 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2014 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2015 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2016 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2017 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2018 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+```
+
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+# Graphing standard deviation of crime count vs standard deviation number of stop and frisks by year, and then coloring by year
+# No trend in data at all
+ggplot(crimeAndCount, mapping = aes(x = crimeChange, y = count)) + geom_point(mapping=aes(color = year)) + geom_smooth(method="lm", color="red", aes(x = crimeChange, y = count)) 
+```
+
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+# Seperating by year in case poilicy changes had an effect, no clear trend still
+ggplot(crimeAndCount, mapping = aes(x = crimeChange, y = count)) + geom_point() + geom_smooth(method="lm", color="red", aes(x = crimeChange, y = count)) + facet_wrap(~year) 
 ```
 
 - Change wasn't related to number of stop and frisks as a whole
@@ -171,8 +380,81 @@ mapdeck(token = "pk.eyJ1Ijoic2xlZTE5IiwiYSI6ImNrNDZmbWl1aTBqcmgzZW8xeDJzcTBsMXEi
 
 ## Relationship Between Crime and Stop And Frisk
 
-```{r, echo = FALSE}
-# Priyanka code chunk
+```{r, echo=FALSE, warning=FALSE}
+# Gives frame with pct, year, and count
+temp <- SQF2003 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+crimeAndCount <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+
+temp <- SQF2004 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2005 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2006 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2007 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2008 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2009 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2010 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2011 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2012 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2013 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2014 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2015 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2016 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2017 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+
+temp <- SQF2018 %>% group_by(year, pct) %>% summarize(count = n()) %>% ungroup() %>% mutate(count = scale(count))
+temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year"))
+crimeAndCount <- rbind(temp,crimeAndCount)
+```
+
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+# Graphing standard deviation of crime count vs standard deviation number of stop and frisks by year, and then coloring by year
+# No trend in data at all
+ggplot(crimeAndCount, mapping = aes(x = crimeSD, y = count)) + geom_point(mapping=aes(color = year)) + geom_smooth(method="lm", color="red", aes(x = crimeSD, y = count)) 
+```
+
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+# Seperating by year in case policy changes had an effect, no clear trend still
+ggplot(crimeAndCount, mapping = aes(x = crimeSD, y = count)) + geom_point() + geom_smooth(method="lm", color="red", aes(x = crimeSD, y = count)) + facet_wrap(~year) 
 ```
 
 - No trend in values or clear positive trend
