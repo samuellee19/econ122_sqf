@@ -1,0 +1,14 @@
+name: "ECON122_SQF_AgarwalLee"
+title: "ECON122 - Stop and Frisk Project"
+description: |
+  ECON122 - Stop and Frisk Project
+output_dir: "docs"
+navbar:
+  right:
+    - text: "Stop and Frisk Project"
+      href: index.html
+    - text: "About"
+      href: about.html
+    - icon: fab fa-github
+      href: https://github.com/econ122-f19/finalproject-agarwallee
+output: distill::distill_article

@@ -1,0 +1,195 @@
+---
+title: "ECON122 - Stop and Frisk Project"
+description: |
+  Data Science and Statistical Learning Course Final Project.
+date: December 20, 2019
+author:
+  - name: "Seungho (Samuel) Lee"
+    affiliation: Claremont McKenna College
+  - name: "Priyanka Agarwal"
+    affiliation: Harvey Mudd College
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  dpi = 300,
+  R.options = list(width = 60)
+)
+
+# Learn more about creating websites with Distill at:
+# https://rstudio.github.io/distill/website.html
+
+# Learn more about publishing to GitHub Pages at:
+# https://rstudio.github.io/distill/publish_website.html#github-pages
+
+```
+
+```{r packageCheck, include=FALSE}
+mypacks <- c("plotly", "tidyverse", "sp", "sf", "shiny", "shinydashboard", "shinyjs", "DT", "mapdeck", "rgdal")  # what packages are needed?
+packs <- installed.packages()   # find installed package list
+install.me <- mypacks[!(mypacks %in% packs[,"Package"])]  #what needs to be installed?
+if (length(install.me) >= 1) install.packages(install.me, repos = "http://cran.us.r-project.org")   # install (if needed)
+lapply(mypacks, library, character.only=TRUE)  # load all packages
+```
+
+# Project Overview
+
+## Background:
+The **Stop, Question and Frisk** program is a practice, utilized by New York City Police Department (NYPD), of temporarily halting, questioning, and, in certain cases, searching civilians on the street for weapons and other dangers. It is also called "Terry Stop," named after the Supreme Court case Terry v. Ohio (1968).
+
+The use of **Stop, Question and Frisk" practice is often endorsed with the Broken Windows Theory, suggesting that even **low-level crimes and civil disorder leads to more serious crimes in urban enviornments.** In fact, after NYPD officer Adrian Schoolcraft made extensive recordings on the department's Stop and Frisk policy, numerous civil rights organizations, such as NYCLU, raised a concern that the program unfairly targest certain minorities, such as African-Americans and Hispanic-Americans. 
+
+A major turning point was the 2013 court case Floyd v. City of New York and a subsequent NYPD mandate that requires officers to thoroughly justify the reason for making a stop.[34] In 2013, 191,558 stops were made.[35]
+
+- 2013 DeBlasio took over and pledged major reform
+- 2008, state judge ruled that they'd have to publicly release information
+- Determine changes from 2003-2007, 2007-2012, then 2013-2016
+
+## Project Objectives:
+1. Visualize the data to get intuit
+
+1. Visualize the data to get intuition for aspects involved
+  - Urgency of crime
+2. Find if there's some effect of Bloomberg's Policy
+  - Determine what the main factors involved were in each of the three times
+  - Make a variable to indicate what era it was in, remove year indicator, see what the regression is like and weight given to era binary variables
+
+----------------
+
+# Methodology
+
+## Data Used
+1. Crime Analysis
+2. Policy Analysis
+- Have data from 2003-2018; 2003-2016 one format, 2017-2018 in different format
+- splot data 2003-2007, 2007-2012, then 2013-2016
+- Combine data with crime rates per precinct for previous year, because you'd expect more unsafe areas to have more stop and frisk/safety patrolling, see trend between stop and frisk and crime rate of area
+- See further what drives stop and frisk between areas by splitting it up by era and seeing main variables
+
+```{r import, eval = FALSE, tidy=FALSE}
+# importing frisk data
+url <- "https://www.nyclu.org/sites/default/files/field_documents/2018_sqf_database.xlsx"
+destfile <- "X2018_sqf_database.xlsx"
+curl::curl_download(url, destfile)
+SQF2018 <- read_excel(destfile) %>%
+  mutate(SUSPECT_HEIGHT = as.numeric(SUSPECT_HEIGHT))
+
+url <- "https://www1.nyc.gov/assets/nypd/downloads/excel/analysis_and_planning/stop-question-frisk/sqf-2017.xlsx"
+destfile <- "sqf-2017.xlsx"
+curl::curl_download(url, destfile)
+SQF2017 <- read_excel(destfile)
+
+SQF1718 <- SQF2018 %>%
+  mutate(STOP_FRISK_ID = STOP_FRISK_ID + nrow(SQF2017)) %>%
+  rename(STOP_FRISK_TIME = "Stop Frisk Time") %>%
+  full_join(SQF2017)
+
+SQF1718 <- SQF1718[order(SQF1718$STOP_FRISK_ID),]
+
+# importing codebook
+url <- "https://www.nyclu.org/sites/default/files/field_documents/2018_sqf_codebook.xlsx"
+destfile <- "X2018_sqf_codebook.xlsx"
+curl::curl_download(url, destfile)
+SQF2018_cb <- read_excel(destfile)
+
+# write to csv file
+#write_csv(SQF1718, "/Users/slee19/Documents/Junior\ First\ Semester/SQF1718.csv")
+
+View(SQF2018_cb)
+```
+
+## Visualizations
+
+
+```{r, tidy=FALSE}
+SQF1718 <- read_csv("https://github.com/samuellee19/econ122_sqf/raw/master/Data%20Files%20Only/SQF1718.csv")
+```
+
+```{r, layout = "1-screen-insert shaded", echo = FALSE}
+SQF1718 <- read_csv("https://github.com/samuellee19/CS5_Project/raw/master/SQF1718.csv")
+test_latlong <- SQF1718[!is.na(SQF1718$STOP_LOCATION_X),]
+test_latlong <- test_latlong[!is.na(test_latlong$STOP_LOCATION_Y),] %>%
+    select(STOP_FRISK_ID, STOP_FRISK_DATE, STOP_FRISK_TIME, YEAR2, MONTH2, DAY2, STOP_WAS_INITIATED, SUSPECTED_CRIME_DESCRIPTION, SUSPECT_ARREST_OFFENSE, SUSPECT_RACE_DESCRIPTION, STOP_LOCATION_X, STOP_LOCATION_Y)
+
+# creating data as sf object
+plot_locations_sp <- test_latlong
+coordinates(plot_locations_sp) <- ~STOP_LOCATION_X + STOP_LOCATION_Y
+
+proj4string(plot_locations_sp) <- CRS('+init=epsg:2263 +proj=lcc +lat_1=41.03333333333333 +lat_2=40.66666666666666 +lat_0=40.16666666666666 +lon_0=-74 +x_0=300000.0000000001 +y_0=0 +datum=NAD83 +units=us-ft +no_defs +ellps=GRS80 +towgs84=0,0,0')
+
+plot_locations_sp <- plot_locations_sp %>% spTransform(CRS("+init=epsg:4326"))
+
+plot_locations_sp <- st_as_sf(plot_locations_sp, coords = c("STOP_LOCATION_X", "STOP_LOCATION_Y"), crs = utm18nCRS)
+
+# dividing the sf object into "Seven Major Felony Offenses" (NYC)
+plot_locations_sf <- test_latlong %>%
+    filter(SUSPECT_ARREST_OFFENSE %in% c("GRAND LARCENY", "ROBBERY", "BURGLARY", "ASSAULT", "RAPE", "TERRORISM", "GRAND LARCENY AUTO", "AUTO STRIPPING", "MURDER"))
+
+coordinates(plot_locations_sf) <- ~STOP_LOCATION_X + STOP_LOCATION_Y
+
+proj4string(plot_locations_sf) <- CRS('+init=epsg:2263 +proj=lcc +lat_1=41.03333333333333 +lat_2=40.66666666666666 +lat_0=40.16666666666666 +lon_0=-74 +x_0=300000.0000000001 +y_0=0 +datum=NAD83 +units=us-ft +no_defs +ellps=GRS80 +towgs84=0,0,0')
+
+plot_locations_sf <- plot_locations_sf %>%
+    spTransform(CRS("+init=epsg:4326"))
+
+plot_locations_sf <- st_as_sf(plot_locations_sf, coords = c("STOP_LOCATION_X", "STOP_LOCATION_Y"), crs = utm18nCRS)
+
+Sys.setenv('MAPBOX_TOKEN' = 'pk.eyJ1Ijoic2xlZTE5IiwiYSI6ImNrNDZmbWl1aTBqcmgzZW8xeDJzcTBsMXEifQ.OvJvDwdVBfB02NaJVLq7Fw')
+
+p <- plot_locations_sp %>%
+  plot_mapbox(mode = 'scattermapbox', hoverinfo='name') %>%
+  layout(font = list(color='white'),
+         plot_bgcolor = '#191A1A', paper_bgcolor = '#191A1A',
+         mapbox = list(style = 'dark'))
+```
+
+```{r mapdeck, layout='l-screen', fig.height=2, out.width='100%', fig.align='center'} 
+mapdeck(token = "pk.eyJ1Ijoic2xlZTE5IiwiYSI6ImNrNDZmbWl1aTBqcmgzZW8xeDJzcTBsMXEifQ.OvJvDwdVBfB02NaJVLq7Fw", style = mapdeck_style("dark"), pitch = 45) %>%
+  add_screengrid(data = plot_locations_sp,
+                 weight = "weight",
+                 layer_id = "screengrid_layer",
+                 cell_size = 6,
+                 opacity = 0.4,
+                 colour_range = colourvalues::colour_values(1:6, palette = "plasma")) %>%
+  add_hexagon(data = plot_locations_sf,
+              layer_id = "hex_layer",
+              radius = 6
+              )
+```
+
+## Effect of Stop and Frisk on Crime Rates
+- Analyze stop and frisk amount as standard deviation for the year vs the change in crime amount from current to previous year, again as a standard deviation
+
+```{r, echo = FALSE}
+# Priyanka code chunk
+```
+
+- Change wasn't related to number of stop and frisks as a whole
+- Sometimes by year had some negative trends, which means the crime decreased as there were more stop and fridks, but also have some years with a positive trend meaning that areas with more stop and frisk also had an increase in crime
+
+## Relationship Between Crime and Stop And Frisk
+
+```{r, echo = FALSE}
+# Priyanka code chunk
+```
+
+- No trend in values or clear positive trend
+- Clearly not based on past crime rate, other factor at play?
+
+## What Factors Actually Matter: Analysis of Effects of Change on Policy
+
+1. Splitting it into three data sets, running 2-3 different feature based regressions to see most important variables, finding average importance across each variable type and comparing
+2. Setting a binary variable to indicate which time period it was in relative to Bloomberg, see weight of that variable given in the different regression methods.
+
+```{r, echo=FALSE}
+# Determing which columns aren't there in all the data sets, so which to drop for variable comparison
+```
+
+## Findings and analysis
+
+1. No connection between stop and frisk and changes in crime rate
+2. No connection between stop and frisk and crime of an area
+
+## Conclusion
