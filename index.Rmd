@@ -34,6 +34,10 @@ if (length(install.me) >= 1) install.packages(install.me, repos = "http://cran.u
 lapply(mypacks, library, character.only=TRUE)  # load all packages
 ```
 
+```{r, echo = FALSE, layout = "l-screen"}
+knitr::include_app( "http://samuellee19.shinyapps.io/SFQ_Final_Project",height = "600px")
+```
+
 # Project Overview
 ## Background:
 The **Stop, Question and Frisk** program is a practice, utilized by New York City Police Department (NYPD), of temporarily halting, questioning, and, in certain cases, searching civilians on the street for weapons and other dangers. It is also called "Terry Stop," named after the Supreme Court case Terry v. Ohio (1968).
@@ -48,26 +52,24 @@ A major turning point was the 2013 court case Floyd v. City of New York and a su
 
 ## Project Objectives:
 1. Visualize the data to get intuit
-
-1. Visualize the data to get intuition for aspects involved
+2. Visualize the data to get intuition for aspects involved
   - Urgency of crime
-2. Find if there's some effect of Bloomberg's Policy
+3. Find if there's some effect of Bloomberg's Policy
   - Determine what the main factors involved were in each of the three times
   - Make a variable to indicate what era it was in, remove year indicator, see what the regression is like and weight given to era binary variables
 
 ----------------
 
 # Methodology
-
 ## Data Used
 1. Crime Analysis
 2. Policy Analysis
 - Have data from 2003-2018; 2003-2016 one format, 2017-2018 in different format
-- splot data 2003-2007, 2007-2012, then 2013-2016
+- split data 2003-2007, 2008-2012, then 2013-2016
 - Combine data with crime rates per precinct for previous year, because you'd expect more unsafe areas to have more stop and frisk/safety patrolling, see trend between stop and frisk and crime rate of area
 - See further what drives stop and frisk between areas by splitting it up by era and seeing main variables
 
-```{r, tidy=FALSE}
+```{r, tidy=FALSE, echo = FALSE}
 # Samuel's Part
 SQF1718 <- read_csv("https://github.com/samuellee19/econ122_sqf/raw/master/Data%20Files%20Only/SQF1718.csv")
 
@@ -364,13 +366,13 @@ temp <- merge(CrimeChangePercentage, temp, by.x = c("PCT", "year"), by.y = c("pc
 crimeAndCount <- rbind(temp,crimeAndCount)
 ```
 
-```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE, echo = FALSE}
 # Graphing standard deviation of crime count vs standard deviation number of stop and frisks by year, and then coloring by year
 # No trend in data at all
 ggplot(crimeAndCount, mapping = aes(x = crimeChange, y = count)) + geom_point(mapping=aes(color = year)) + geom_smooth(method="lm", color="red", aes(x = crimeChange, y = count)) 
 ```
 
-```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE, echo = FALSE}
 # Seperating by year in case poilicy changes had an effect, no clear trend still
 ggplot(crimeAndCount, mapping = aes(x = crimeChange, y = count)) + geom_point() + geom_smooth(method="lm", color="red", aes(x = crimeChange, y = count)) + facet_wrap(~year) 
 ```
@@ -446,13 +448,13 @@ temp <- merge(CrimeRates, temp, by.x = c("PCT", "year"), by.y = c("pct", "year")
 crimeAndCount <- rbind(temp,crimeAndCount)
 ```
 
-```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE, echo = FALSE}
 # Graphing standard deviation of crime count vs standard deviation number of stop and frisks by year, and then coloring by year
 # No trend in data at all
 ggplot(crimeAndCount, mapping = aes(x = crimeSD, y = count)) + geom_point(mapping=aes(color = year)) + geom_smooth(method="lm", color="red", aes(x = crimeSD, y = count)) 
 ```
 
-```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE}
+```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE, echo = FALSE}
 # Seperating by year in case policy changes had an effect, no clear trend still
 ggplot(crimeAndCount, mapping = aes(x = crimeSD, y = count)) + geom_point() + geom_smooth(method="lm", color="red", aes(x = crimeSD, y = count)) + facet_wrap(~year) 
 ```
