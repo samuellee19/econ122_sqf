@@ -1,6 +1,6 @@
 ## ECON122 Final Project - Priyanka Agarwal and Seungho (Samuel) Lee
 
-The followings are the list of files used in this project, as well as, files uploaded on this GitHub repository.
+The followings are the list of files used in this project.
 
 ### Data
 Link: http://bit.ly/DSFinalProjectData    
@@ -51,10 +51,3 @@ Files:
 6. `plot_locations_1316SF.RData`: 2013-2016 SQF SF Objects limited to `Seven Major Felonies`    
 7. `plot_locations_1718.RData`: 2017-2018 SQF SF Objects    
 8. `plot_locations_1718SF.RData`: 2017-2018 SQF SF Objects limited to `Seven Major Felonies`   
-
-### Repo Files       
-Files:    
-1. `Part_Priyanka.Rmd`: Codes from Priyanka's part   
-2. `Part_Samuel.Rmd`: Data Transformation Code from Samuel's part   
-3. `SFQ_Final_Project`: Relevant Code for Shiny App Implementation   
-4. `README.md`: List of Files and Explanation
