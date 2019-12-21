@@ -37,7 +37,7 @@ if (length(install.me) >= 1) install.packages(install.me, repos = "http://cran.u
 lapply(mypacks, library, character.only=TRUE)  # load all packages
 ```
 
-```{r, fig.cap = "Due to Comaptility issue with GitHub Pages, please go to https://samuellee19.shinyapps.io/SFQ_Final_Project/ to use interactive dashboard.", echo = FALSE, layout = "l-screen-inset"}
+```{r, fig.cap = "Due to Compatibility issue with GitHub Pages, please go to https://samuellee19.shinyapps.io/SFQ_Final_Project/ to use interactive dashboard.", echo = FALSE, layout = "l-screen-inset"}
 knitr::include_graphics("Shinyapp.png")
 ```
 
