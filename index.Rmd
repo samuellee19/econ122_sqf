@@ -1,7 +1,7 @@
 ---
 title: "ECON122 - Stop and Frisk Project"
 description: |
-  Data Science and Statistical Learning Course Final Project.
+  Analyzing Stop and Frisk Data from 2003 to 2018 Periods - New York City
 date: December 20, 2019
 author:
   - name: "Seungho (Samuel) Lee"
