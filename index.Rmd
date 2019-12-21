@@ -129,7 +129,7 @@ The first factor we analyzed  which may lead to there being more stop and frisks
 library(knitr)
 include_graphics("amount1.png")
 ```
-```{r, fig.cap = "the Amount of Crime vs the Amount of Stop and Frisks in per Precinct by Year", layout = "1-body-inset", warning = FALSE, echo = FALSE}
+```{r, fig.cap = "the Amount of Crime vs the Amount of Stop and Frisks per Precinct by Year", layout = "1-body-inset", warning = FALSE, echo = FALSE}
 knitr::include_graphics("amount2.png")
 ```
 
