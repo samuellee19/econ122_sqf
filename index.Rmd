@@ -37,9 +37,13 @@ if (length(install.me) >= 1) install.packages(install.me, repos = "http://cran.u
 lapply(mypacks, library, character.only=TRUE)  # load all packages
 ```
 
-```{r, echo = FALSE, layout = "l-screen-inset"}
-knitr::include_app( "http://samuellee19.shinyapps.io/SFQ_Final_Project")
+```{r, fig.cap = "Due to Comaptility issue with GitHub Pages, please go to https://samuellee19.shinyapps.io/SFQ_Final_Project/ to use interactive dashboard.", echo = FALSE, layout = "l-screen-inset"}
+knitr::include_graphics("Shinyapp.png")
 ```
+
+<aside>
+Due to Comaptility issue with GitHub Pages, please go to https://samuellee19.shinyapps.io/SFQ_Final_Project/ to use interactive dashboard.
+</aside>
 
 # Project Overview
 ## Background:
@@ -71,7 +75,6 @@ For this project, we will be using New York City data on Stop and Frisk practice
 - See further what drives stop and frisk between areas by splitting it up by era and seeing main variables
 
 ## Visualizations
-
 For this project, we mostly used `library(mapdeck)` to create **screengrid** and **hexagon objects** to show density of Stop and Frisk events across our timeline, as you can see from the above dashboard. 
 
 ```{r, fig.cap = "Spatial Points of Stop and Frisk Data (2017-2018) with Plotly and Mapbox", layout = "1-page", echo = FALSE, fig.height = 3}
@@ -90,11 +93,6 @@ p
 ```
 
 This is a basic interactive scatterplot of 2017-2018 Period data created on Plotly and Mapbox. We can see that spatial points are dispersed across all of New York City boroughs. While this scatterplot allows us to see where **Stop, Question, and Frisk** practices are happening, there is no way to be certain which areas have higher rate or density of occurance. In order to resolve the issue, we created a screengrid interactive that you can zoom in and out, tilt, and move around.
-
-Basic Control Guidance for Mapbox (Mapdeck):
-- Moving: **Arrow Keys**
-- Zoom: **Scroll Wheel**
-- Tilting: **Control (Command on mac) + Shift + Arrow Keys**
 
 | Control Options  | Description                                       |
 |------------------|---------------------------------------------------|
@@ -118,11 +116,11 @@ mapdeck(token = "pk.eyJ1Ijoic2xlZTE5IiwiYSI6ImNrNDZmbWl1aTBqcmgzZW8xeDJzcTBsMXEi
 
 It is also important to mention that the density is expressed by color. From the map, we can see that there are significantly more density in northern parts of and above Manhattan, such as East Harlem, Fordham, and Bronx. Since East Harlem and Fordham have significant minority population, it would be interesting to see whether race has an influence over decision-making of NYPD's Stop, Question, and Frisk practice. 
 
-You can also conduct further interaction with more data points and options with a dashboard that we created on the top.
+You can also conduct further interaction with more data points and options with a dashboard that we created on the top. You can also access the dashboard at https://samuellee19.shinyapps.io/SFQ_Final_Project/.
 (NOTE: some features could take some time to render due to size of our data)
 
 ## Effect of Stop and Frisk on Crime Rates
-- Analyze stop and frisk amount as standard deviation for the year vs the change in crime amount from current to previous year, again as a standard deviation
+To begin, we wanted to analyze whether stop and frisk actually practices seem to have any impact on the crime rate seen in an area. Therefore, using the data described above, we decided to visualize **the effect of the stop and frisks on the crime rate of an area, by precinct.** To do this, we first normalized the number of stops per precinct over a year. We then found the rate of change in the amount of crime per precinct for each year we had data on. Finally, we graphed this information, as shown below.
 
 ```{r, layout = "1-body-outset", warning = FALSE, echo = FALSE}
 library(knitr)
@@ -133,10 +131,13 @@ include_graphics("unnamed-chunk-8-1.png")
 include_graphics("unnamed-chunk-9-1.png")
 ```
 
-- Change wasn't related to number of stop and frisks as a whole
-- Sometimes by year had some negative trends, which means the crime decreased as there were more stop and fridks, but also have some years with a positive trend meaning that areas with more stop and frisk also had an increase in crime
+As we can see, there isn't always a clear pattern in a relationship between the change of the number of crime and the scaled amount of stop and frisks seen in a precinct. If the stop and frisks did have an effect on crime, we would have expected there to be a strongly negative correlation. However, there doesn't seem to be any relationship between these two values. When we seperate the values by year, we can also see sometimes there were some negative trends, which means the crime decreased as there were more stop and frisks, but also have some years with a positive trend meaning that areas with more stop and frisk also had an increase in crime. Therefore, there doesn't seem to be **a clear connection between the number of stop and frisks and the change in crime of an area.** Therefore, this suggests that stop and frisks didn't seem to serve the purpose they set out accomplish: **the data doesn't suggest clear alleviations in the cime rate.**
+
+# Factors for Choosing Stop and Frisk Individuals 
+Because the stop and frisks didn't seem to be helping the crime rate in an area, we next wanted to figure out exactly how these stop and frisks were being conducted: **what factors lead to someone being more likely to be chosen for a stop and frisk?**
 
 ## Relationship Between Crime and Stop And Frisk
+The first factor we analayzed which may lead to there being more stop and frisks in an area is how much crime happens there. We'd expect areas to have more crimes overall to also have a higher rate of stop and frisks, because the purpose of the stop and frisks would be to try and target these high crime areas. We therefore worked on visualizing **a relationship between the amount of crime in an area and the amount of stop and frisks in an area, by year.** We did this by standardizing the amount of crime per precinct by year, and then standardizing the amount of stop and frisks conducted per precinct by year. We then plotted these values, as shown below.
 
 ```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE, echo = FALSE}
 # Graphing standard deviation of crime count vs standard deviation number of stop and frisks by year, and then coloring by year
@@ -149,15 +150,14 @@ include_graphics("unnamed-chunk-11-1.png")
 include_graphics("unnamed-chunk-12-1.png")
 ```
 
-- No trend in values or clear positive trend
-- Clearly not based on past crime rate, other factor at play?
+Through these graphs, we can see again there is no trend in values or clear positive trend, in fact there is a slightly negative trend. This means that even though areas had a high amount of crime, there wasn't a **corresponding high amount of stop and frisks happening in that area.** One may think this is due to the stop and frisks decreasing the amount of crime in that year, but as we saw in the above analysis there was no relationship between these two variables. Therefore, we can see that stop and frisks don't affect the crime rate, and it's also not based on where there is more crime. Therefore, **there must be other factors in play, in determining which individuals were more likely to be stopped and frisked.** 
 
 ## What Factors Actually Matter: Analysis of Effects of Change on Policy
 1. Splitting it into three data sets, running 2-3 different feature based regressions to see most important variables, finding average importance across each variable type and comparing
 2. Setting a binary variable to indicate which time period it was in relative to Bloomberg, see weight of that variable given in the different regression methods.
 
 ```{r, echo=FALSE}
-# Determing which columns aren't there in all the data sets, so which to drop for variable comparison
+# summary(SQF2004$race)
 ```
 
 ----------------
