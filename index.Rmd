@@ -18,7 +18,7 @@ site: distill::distill_website
 knitr::opts_chunk$set(
   echo = TRUE,
   dpi = 300,
-  R.options = list(width = 60)
+  R.options = list(width = 70)
 )
 
 # Learn more about creating websites with Distill at:
@@ -113,7 +113,6 @@ To begin, we wanted to analyze whether stop and frisk actually seemed to be havi
 library(knitr)
 include_graphics("change1.png")
 ```
-
 ```{r, layout = "1-body-inset", fig.cap = "Change in Crime Rate vs Amount of Stop and Frisks per Precinct by Year", warning = FALSE, echo = FALSE}
 knitr::include_graphics("change2.png")
 ```
@@ -130,7 +129,6 @@ The first factor we analyzed  which may lead to there being more stop and frisks
 library(knitr)
 include_graphics("amount1.png")
 ```
-
 ```{r, fig.cap = "the Amount of Crime vs the Amount of Stop and Frisks in per Precinct by Year", layout = "1-body-inset", warning = FALSE, echo = FALSE}
 knitr::include_graphics("amount2.png")
 ```
