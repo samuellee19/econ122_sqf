@@ -45,30 +45,24 @@ knitr::include_graphics("Shinyapp.png")
 ## Background:
 The **Stop, Question and Frisk** program is a practice, utilized by New York City Police Department (NYPD), of temporarily halting, questioning, and, in certain cases, searching civilians on the street for weapons and other dangers. It is also called "Terry Stop," named after the Supreme Court case Terry v. Ohio (1968).
 
-The use of **Stop, Question and Frisk** practice is often endorsed with the Broken Windows Theory, suggesting that even **low-level crimes and civil disorder leads to more serious crimes in urban enviornments.** In fact, after NYPD officer Adrian Schoolcraft made extensive recordings on the department's Stop and Frisk policy, numerous civil rights organizations, such as NYCLU, raised a concern that the program **unfairly targest certain minorities, such as African-Americans and Hispanic-Americans**. Similarly, the Guardian reporter also noted that "since 2002 (the Kelly/Bloomberg years), over 35% of officers feel high pressure to write stop-and-frisk reports...felt less pressire to obey consitutional constraints."[@eterno_silverman_2013] 
+While it had been used previously by the police as a method to deter crime, it was championed by Mayor Bloomberg when he was elected in late 2002. Since then, there has been a lot of controvery surrounding the Stop and Frisk practice, It has been sited as being discrimnatory, and many have claimed that there are racist motivations in choosing who gets stopped and then frisked.
+
+The use of **Stop, Question and Frisk** practice is often endorsed with the Broken Windows Theory, suggesting that even **low-level crimes and civil disorder leads to more serious crimes in urban enviornments.** In fact, after NYPD officer Adrian Schoolcraft made extensive recordings on the department's Stop and Frisk policy, numerous civil rights organizations, such as NYCLU, raised a concern that the program **unfairly targest certain minorities, such as African-Americans and Hispanic-Americans**. Similarly, the Guardian reporter also noted that "since 2002 (the Kelly/Bloomberg years), over 35% of officers feel high pressure to write stop-and-frisk reports...felt less pressire to obey consitutional constraints."[@eterno_silverman_2013]. Due to this, in 2008, a state judge ruled that the police department had to publicly release information regarding this practice.
 
 A major turning point was the 2013 court case Floyd v. City of New York and a subsequent NYPD mandate that requires officers to thoroughly justify the reason for making a stop. After Bloomberg's mayorship ended, Bill de Blasio took over the office and pledged for a major reform on NYPD policies. 
 
-For this project, we will be using New York City data on Stop and Frisk practice, from 2003 to 2018. Due to formatting changes happened circa 2017, data from 2017-2018 period will be limited to visualization process. Hence, we will determine changes from 2003-2007, 2007-2012, and 2013-2016 periods.
 
 ## Project Objectives:
-1. Visualize the data to get intuit
-2. Visualize the data to get intuition for aspects involved
-  - Urgency of crime
-3. Find if there's some effect of Bloomberg's Policy
-  - Determine what the main factors involved were in each of the three times
-  - Make a variable to indicate what era it was in, remove year indicator, see what the regression is like and weight given to era binary variables
+One of the major reasons given for the Stop and Frisk policy is the amount of crime in New York. Therefore, we begin by creating a visualization tool to the crime by year and region in New York. This will allow us to get better intution for how crime changes by area and year in New York. Next, many critics of the Stop and Frisk policy claim that it isn't actually effective in deterring crime. Therefore, we'll be visualing how this program has changed the rate of crime. Finally, we seek to determine how just the this practice is, and whether any policy changes have impacted how equitable it is. Therefore, we begin by determining if areas with higher crime rates also have individuals being stopped and frisked more, as one would expect. We then will see if any changes in policy and administration have effected how fair this policy is. While much analysis has been done on the discriminatory practices of actually stopping the individuals, not much has been done on how individuals are then chosen to be searched or frisked. We therefore analyze what are the main factors into determining this over three "eras" of policy change, which we go into more detail about in the relevant section, to then compare how the policy changes have affected this practice.
 
 ----------------
 
 # Methodologies
 ## Data Used
-1. Crime Analysis
-2. Policy Analysis
-- Have data from 2003-2018; 2003-2016 one format, 2017-2018 in different format
-- split data 2003-2007, 2008-2012, then 2013-2016
-- Combine data with crime rates per precinct for previous year, because you'd expect more unsafe areas to have more stop and frisk/safety patrolling, see trend between stop and frisk and crime rate of area
-- See further what drives stop and frisk between areas by splitting it up by era and seeing main variables
+
+The data is found in the following Drive folder: http://bit.ly/DSFinalProjectData
+
+There were 2 pieces of data we used, the first was data about Crime in New York by Precinct from 2000-2018. The data came from the New York State Police Department (https://www1.nyc.gov/assets/nypd/). The second is the Stop and Frisk data collected by the New York Police Department from 2003-2018 for each individual they stopped. For 2018, this data came from New York's ACLU branch (https://www.nyclu.org) but for the remaining years the data came from the New York State Police Department (https://www1.nyc.gov/assets/nypd/). The Stop and Frisk data for 2017-2018 was in a different format than the data from 2003-2016, Therefore, we'll be using data from 2003-2018 for visualization and part of our analysis. However, for our analysis related to the factors in determining whether or not an individual is searched or frisked, the data we use is from 2003-2016 to allow for comparisons between the years.
 
 ## Visualizations
 For this project, we mostly used `library(mapdeck)` to create **screengrid** and **hexagon objects** to show density of Stop and Frisk events across our timeline, as you can see from the above dashboard. 
