@@ -41,10 +41,6 @@ lapply(mypacks, library, character.only=TRUE)  # load all packages
 knitr::include_graphics("Shinyapp.png")
 ```
 
-<aside>
-Due to Comaptility issue with GitHub Pages, please go to https://samuellee19.shinyapps.io/SFQ_Final_Project/ to use interactive dashboard.
-</aside>
-
 # Project Overview
 ## Background:
 The **Stop, Question and Frisk** program is a practice, utilized by New York City Police Department (NYPD), of temporarily halting, questioning, and, in certain cases, searching civilians on the street for weapons and other dangers. It is also called "Terry Stop," named after the Supreme Court case Terry v. Ohio (1968).
@@ -92,7 +88,7 @@ p <- plot_locations_1718 %>%
 p
 ```
 
-This is a basic interactive scatterplot of 2017-2018 Period data created on Plotly and Mapbox. We can see that spatial points are dispersed across all of New York City boroughs. While this scatterplot allows us to see where **Stop, Question, and Frisk** practices are happening, there is no way to be certain which areas have higher rate or density of occurance. In order to resolve the issue, we created a screengrid interactive that you can zoom in and out, tilt, and move around.
+This is a basic interactive scatterplot of 2017-2018 Period data created on Plotly and Mapbox. We can see that spatial points are dispersed across all of New York City boroughs. While this scatterplot allows us to see where **Stop, Question, and Frisk** practices are happening, there is no way to be certain which areas have higher rate or density of occurance. In order to resolve the issue, we created a screengrid interactive that you can zoom in and out, tilt, and move around:
 
 | Control Options  | Description                                       |
 |------------------|---------------------------------------------------|
