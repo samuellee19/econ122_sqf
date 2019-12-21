@@ -116,52 +116,44 @@ You can also conduct further interaction with more data points and options with 
 (NOTE: some features could take some time to render due to size of our data)
 
 ## Effect of Stop and Frisk on Crime Rates
-To begin, we wanted to analyze whether stop and frisk actually practices seem to have any impact on the crime rate seen in an area. Therefore, using the data described above, we decided to visualize **the effect of the stop and frisks on the crime rate of an area, by precinct.** To do this, we first normalized the number of stops per precinct over a year. We then found the rate of change in the amount of crime per precinct for each year we had data on. Finally, we graphed this information, as shown below.
+To begin, we wanted to analyze whether stop and drisk actually seemed to be having any impact on the crime rate seen in an area. Therefore, using the data described above, we decided to visualize the effect of the stop and frisks on the crime rate of an area, by precinct. To do this, we first normalized the number of stops per precinct over a year. We then found the rate of change in the amount of crime per precinct for each year we had data on. Finally, we graphed this information, as shown below.
 
 ```{r, layout = "1-body-outset", warning = FALSE, echo = FALSE}
 library(knitr)
-include_graphics("unnamed-chunk-8-1.png")
+include_graphics("change1.png")
+include_graphics("change2.png")
 ```
 
-```{r, layout = "1-body-outset", warning = FALSE, echo = FALSE}
-include_graphics("unnamed-chunk-9-1.png")
-```
+As we can see, there isn't always a clear pattern in a relationship between the change of the number of crime and the scaled amount of stop and frisks seen in a precinct. If the stop and frisks did have an effect on crime, we would have expected there to be a strongly negative correlation. However, there doesn't seem to be any relationship between these two values. When we seperate the values by year, we can also see sometimes there were some negative trends, which means the crime decreased as there were more stop and frisks, but also have some years with a positive trend meaning that areas with more stop and frisk also had an increase in crime. Therefore, there doesn't seem to be a clear connection between the number of stop and frisks and the change in crime of an area. Therefore, this suggests that stop and frisks didn't seem to serve the purpose they set out accomplish -- the data doesn't suggest clear alleviations in the cime rate.
 
-As we can see, there isn't always a clear pattern in a relationship between the change of the number of crime and the scaled amount of stop and frisks seen in a precinct. If the stop and frisks did have an effect on crime, we would have expected there to be a strongly negative correlation. However, there doesn't seem to be any relationship between these two values. When we seperate the values by year, we can also see sometimes there were some negative trends, which means the crime decreased as there were more stop and frisks, but also have some years with a positive trend meaning that areas with more stop and frisk also had an increase in crime. Therefore, there doesn't seem to be **a clear connection between the number of stop and frisks and the change in crime of an area.** Therefore, this suggests that stop and frisks didn't seem to serve the purpose they set out accomplish: **the data doesn't suggest clear alleviations in the cime rate.**
-
-# Factors for Choosing Stop and Frisk Individuals 
-Because the stop and frisks didn't seem to be helping the crime rate in an area, we next wanted to figure out exactly how these stop and frisks were being conducted: **what factors lead to someone being more likely to be chosen for a stop and frisk?**
+# Factors for Stop and Frisk Individuals being Searched or Frisked
+Because the stop and frisks didn't seem to be helping the crime rate in an area, we next wanted to figure out exactly how these stop and frisks were being conducted -- what factors lead to someone being more likely to be chosen for a stop and frisk?
 
 ## Relationship Between Crime and Stop And Frisk
-The first factor we analayzed which may lead to there being more stop and frisks in an area is how much crime happens there. We'd expect areas to have more crimes overall to also have a higher rate of stop and frisks, because the purpose of the stop and frisks would be to try and target these high crime areas. We therefore worked on visualizing **a relationship between the amount of crime in an area and the amount of stop and frisks in an area, by year.** We did this by standardizing the amount of crime per precinct by year, and then standardizing the amount of stop and frisks conducted per precinct by year. We then plotted these values, as shown below.
+The first factor we analayzed which may lead to there being more stop and frisks in an area is how much crime happens there. We'd expect areas to have more crimes overall to also have a higher rate of stop and frisks, because the purpose of the stop and frisks would be to try and target these high crime areas. We therefore worked on visualizing a relationship between the amount of crime in an area and the amount of stop and frisks in an area, by year. We did this by standardizing the amount of crime per precinct by year, and then standardizing the amount of stop and frisks conducted per precinct by year. We then plotted these values, as shown below.
 
-```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE, echo = FALSE}
-# Graphing standard deviation of crime count vs standard deviation number of stop and frisks by year, and then coloring by year
-# No trend in data at all
-include_graphics("unnamed-chunk-11-1.png") 
+
+```{r, layout = "1-body-outset", warning = FALSE, echo = FALSE}
+library(knitr)
+include_graphics("amount1.png")
+include_graphics("amount2.png")
 ```
 
-```{r, layout = "1-body-outset", warning = FALSE, tidy=FALSE, echo = FALSE}
-# Seperating by year in case policy changes had an effect, no clear trend still
-include_graphics("unnamed-chunk-12-1.png")
-```
-
-Through these graphs, we can see again there is no trend in values or clear positive trend, in fact there is a slightly negative trend. This means that even though areas had a high amount of crime, there wasn't a **corresponding high amount of stop and frisks happening in that area.** One may think this is due to the stop and frisks decreasing the amount of crime in that year, but as we saw in the above analysis there was no relationship between these two variables. Therefore, we can see that stop and frisks don't affect the crime rate, and it's also not based on where there is more crime. Therefore, **there must be other factors in play, in determining which individuals were more likely to be stopped and frisked.** 
+Through these graphs, we can see again there is no trend in values or clear positive trend, in fact there is a slightly negative trend. This means that even though areas had a high amount of crime, there wasn't a corresponding high amount of stop and frisks happening in that area. One may think this is due to the stop and frisks decreasing the amount of crime in that year, but as we saw in the above analysis there was no relationship between these two variables. Therefore, we can see that stop and frisks don't affect the crime rate, and it's also not based on where there is more crime. Therefore, there must be other factors in play, in determining which individuals were more likely to be stopped and frisked. 
 
 ## What Factors Actually Matter: Analysis of Effects of Change on Policy
-1. Splitting it into three data sets, running 2-3 different feature based regressions to see most important variables, finding average importance across each variable type and comparing
-2. Setting a binary variable to indicate which time period it was in relative to Bloomberg, see weight of that variable given in the different regression methods.
 
-```{r, echo=FALSE}
-# summary(SQF2004$race)
-```
+Because crime rate didn't have a clear relationship with the amount of stop and frisks, we then turned to the data of the stop and frisks to see what were the main factors which lead to individual being frisked or searched. The way we did this was to use a random forest model to find given the variables in the data whether or not someone would be frisked/searched or not. We then found the most important variables for each of the random forests. We made a random forest for every other year, and then found the important factors on them. We then averaged the importance across the years in the different groups of years. We chose the years 2003-2007, 2008-2012, and then 2013-2016 as our three eras for which to find which variables were important. We chose these years because of policy and administration changes. In 2007, ther was a ruling which said that the stop and frisk had to be publicly available. Following this ruling, there was a lot of analysis on the data and public outcry over discrimnatory practices. In 2013, Bloomberg's mayoral administration came to an end. Bloomberg was a major proponent for stop and frisk, and following de Blasio's entrance as mayor, there were large policy changes in how the stop and frisk was conducted. One policy change, due to a court case, enforced that thorough justification must be given for why someone is stopped and searched.
 
-----------------
+The 6 most important factors for whether or not somone was searched or frisked after being stopped are:
+2003-2007: Furitive Movements, Inapprioriate Attire for Season, Suspicious Bulge, Refusal to Comply with Officer's Directions, Actions Engaging in a Violent Crime, and Other
+2008-2012: Furitive Movements, Actions Engaging in a Violent Crime, Inapprioriate Attire for Season, Refusal to Comply with Officer's Directions, Suspicious Bulge, and Other 
+2013-2016: Furitive Movements, Actions Engaging in a Violent Crime, Risk from Action of Engaging in Violent Crime, Suspicion of Weapons, Refusal to Comply with Officer's Directions, Inapprioriate Attire for Season
 
-# Findings and analysis
-1. No connection between stop and frisk and changes in crime rate
-2. No connection between stop and frisk and crime of an area
+For the first 2 eras, the top 6 reasons were the same, but the order in which the reasons occured was different. In the third era, Actional of Violent Crime and Suspicion of Weapons swapped with Suspicious Bulge and Other. Some of the interesting parts of these values are that half of the reasons in first 2 eras are ambigious or subjective. Having inappropriate attire could be caused by many things, having a suspicious bulge is a very subjective reasons, and within the other category, there were generally very subjective descriptions. In the third era, these variables seem much less subjective and much more clear indiciators of a risk of crime. The inappropriate attire variable is still there, but it's now become the least important of the 6. The other 2 subjective variables have been swapped with variables that are much less subjective.
 
-----------------
+Therefore, while there doesn't seem to be any clear discriminatory practices in how individuals were chosen to be searched or frisked, there did seem to be a lot of subjective factors that went to it, especially when Bloomberg was mayor. It seems like the policy enacted in 2013 did have an effect in ensuring that the justification for why someone is stopped, searched, and frisked was thorough.
 
-# Conclusion
+## Conclusion
+
+To begin, stop and frisk doesn't have a clear effect on decreasing the amount of crime an area sees. Further, there isn't a connection between the amount of stop and frisk and the amount of crime which does happen in an area. While past research has focussed a lot on discriminatory practices in the way individuals are chosen to be stopped, our research, which focusses on the method individuals are chosen to be searched or frisked, found that were not any glaringly discriminatory practices. However, during the Bloomberg administration, a lot of the factors which determined whether or not an individual was searched or frisked seemed extremely subjective. During de Blasio's term, the factors are more objective and substantiated by evidence.
