@@ -109,11 +109,11 @@ You can also conduct further interaction with more data points and options with 
 ## Effect of Stop and Frisk on Crime Rates
 To begin, we wanted to analyze whether stop and frisk actually seemed to be having any impact on the crime rate seen in an area. Therefore, using the data described above, we decided to visualize the effect of the stop and frisks on the crime rate of an area, by precinct. To do this, we first normalized the number of stops per precinct over a year. We then found the rate of change in the amount of crime per precinct for each year we had data on. Finally, we graphed this information, as shown below.
 
-```{r, layout = "1-body-outset", fig.cap = "Change in Crime Rate vs Amount of Stop and Frisks per Precinct", warning = FALSE, echo = FALSE}
+```{r, layout = "l-page", fig.cap = "Change in Crime Rate vs Amount of Stop and Frisks per Precinct", warning = FALSE, echo = FALSE}
 library(knitr)
 include_graphics("change1.png")
 ```
-```{r, layout = "1-body-inset", fig.cap = "Change in Crime Rate vs Amount of Stop and Frisks per Precinct by Year", warning = FALSE, echo = FALSE}
+```{r, layout = "l-page", fig.cap = "Change in Crime Rate vs Amount of Stop and Frisks per Precinct by Year", warning = FALSE, echo = FALSE}
 knitr::include_graphics("change2.png")
 ```
 
@@ -125,11 +125,11 @@ Because the stop and frisks didn't seem to be helping the crime rate in an area,
 ## Relationship Between Crime and Stop And Frisk      
 The first factor we analyzed  which may lead to there being more stop and frisks in an area is how much crime happens there. We'd expect areas to have more crimes overall to also have a higher rate of stop and frisks, because the purpose of the stop and frisks would be to try and target these high crime areas. We therefore worked on visualizing a relationship between **the amount of crime in an area and the amount of stop and frisks in an area, by year.** We did this by standardizing the amount of crime per precinct by year, and then standardizing the amount of stop and frisks conducted per precinct by year. We then plotted these values, as shown below.
 
-```{r, layout = "1-body-outset", fig.cap = "the Amount of Crime vs the Amount of Stop and Frisks per Precinct", warning = FALSE, echo = FALSE}
+```{r, layout = "l-page", fig.cap = "the Amount of Crime vs the Amount of Stop and Frisks per Precinct", warning = FALSE, echo = FALSE}
 library(knitr)
 include_graphics("amount1.png")
 ```
-```{r, fig.cap = "the Amount of Crime vs the Amount of Stop and Frisks per Precinct by Year", layout = "1-body-inset", warning = FALSE, echo = FALSE}
+```{r, layout = "l-page", fig.cap = "the Amount of Crime vs the Amount of Stop and Frisks per Precinct by Year", warning = FALSE, echo = FALSE}
 knitr::include_graphics("amount2.png")
 ```
 
