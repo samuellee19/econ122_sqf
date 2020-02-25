@@ -10,5 +10,5 @@ navbar:
     - text: "About"
       href: about.html
     - icon: fab fa-github
-      href: https://github.com/econ122-f19/finalproject-agarwallee
+      href: https://github.com/samuellee19/ECON122_Stop_Frisk
 output: distill::distill_article
